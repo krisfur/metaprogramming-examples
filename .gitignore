@@ -1,0 +1,43 @@
+# C
+*.o
+*.obj
+1-C/user
+
+# Rust
+target/
+Cargo.lock
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.ruff_cache/
+
+# Odin
+4-Odin/odin
+*.bin
+
+# C++ / CMake
+build/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+.ninja_deps
+.ninja_log
+build.ninja
+
+# Zig
+zig-cache/
+zig-out/
+.zig-cache/
+
+# Lisp
+*.fasl
+
+# Editors / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
