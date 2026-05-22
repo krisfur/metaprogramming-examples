@@ -2,9 +2,11 @@
 class-creation time and synthesizes __init__, __repr__, __eq__, etc.
 The metaprogramming runs once, at import — not on every instance.
 
-Inspect the generated __init__ with:
-    import inspect, dataclasses
-    print(inspect.getsource(User.__init__))
+Inspect the generated __init__ signature with:
+    import inspect
+    print(inspect.signature(User.__init__))
+(inspect.getsource doesn't work — @dataclass exec's __init__ from a
+generated string, so there's no source file to read.)
 """
 
 import json
