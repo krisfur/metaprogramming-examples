@@ -117,8 +117,10 @@ cc -E 1-C/main.c | sed -n '/typedef struct/,/^}/p'
 # Rust: expanded derive (needs `cargo install cargo-expand`)
 cd 2-Rust && cargo expand
 
-# Python: the synthesised __init__
-cd 3-Python && python3 -c "import inspect; from main import User; print(inspect.getsource(User.__init__))"
+# Python: the synthesised __init__ signature
+# (inspect.getsource doesn't work — @dataclass exec's __init__ from a
+# generated string, so there's no source file to read.)
+cd 3-Python && python3 -c "import inspect; from main import User; print(inspect.signature(User.__init__))"
 
 # Lisp: macroexpansion is printed by main.lisp itself
 ```
