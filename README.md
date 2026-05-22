@@ -17,12 +17,12 @@ Same problem, seven mechanisms.
 | --- | --------------------------------------- | ----------- | --------------------------------------- |
 | 1   | [`1-C/`](1-C)                           | C           | X-macros (preprocessor)                 |
 | 2   | [`2-Rust/`](2-Rust)                     | Rust        | `#[derive(Serialize)]` procedural macro |
-| 3   | [`3-Python/`](3-Python)                 | Python      | `@dataclass` decorator                  |
-| 4   | [`4-Odin/`](4-Odin)                     | Odin        | parametric proc + `core:reflect`        |
-| 5a  | [`5-Cpp/templates/`](5-Cpp/templates)   | C++17       | templates + `if constexpr`              |
-| 5b  | [`5-Cpp/constexpr/`](5-Cpp/constexpr)   | C++20       | compile-time evaluation (FNV1a switch)  |
-| 5c  | [`5-Cpp/reflection/`](5-Cpp/reflection) | C++26       | static reflection (P2996)               |
-| 6   | [`6-Zig/`](6-Zig)                       | Zig         | `comptime` + `@typeInfo` + `inline for` |
+| 3   | [`3-Python/`](3-Python)                 | Python      | `@dataclass` + custom decorator         |
+| 4a  | [`4-Cpp/templates/`](4-Cpp/templates)   | C++17       | templates + `if constexpr`              |
+| 4b  | [`4-Cpp/constexpr/`](4-Cpp/constexpr)   | C++20       | compile-time evaluation (FNV1a switch)  |
+| 4c  | [`4-Cpp/reflection/`](4-Cpp/reflection) | C++26       | static reflection (P2996)               |
+| 5   | [`5-Zig/`](5-Zig)                       | Zig         | `comptime` + `@typeInfo` + `inline for` |
+| 6   | [`6-Odin/`](6-Odin)                     | Odin        | parametric proc + `core:reflect`        |
 | 7   | [`7-Lisp/`](7-Lisp)                     | Common Lisp | `defmacro` (code-as-data)               |
 
 ## What each one shows
@@ -46,28 +46,31 @@ source string. Same idea as Rust's derive, moved from compile time
 to import time in a dynamic language. The script prints the generated
 source before running it.
 
-**4 Odin — runtime introspection.** Odin has no user macros and no
-proc macros. Its metaprogramming is parametric polymorphism plus
-`core:reflect` walking the Type_Info attached to `any` at runtime.
-The "or you skip codegen entirely" counterpoint to Rust/Python.
-
-**5a C++ templates.** The compiler stamps out specialised code per
+**4a C++ templates.** The compiler stamps out specialised code per
 type. `if constexpr` branches on traits at compile time so runtime
 stays branch-free. (The `std::vector<bool>` proxy quirk is skipped in
 the demo — left as a comment.)
 
-**5b C++ constexpr.** Realistic use: `fnv1a` on a string literal at
+**4b C++ constexpr.** Realistic use: `fnv1a` on a string literal at
 compile time so you can `switch` on strings, which the language
 otherwise forbids.
 
-**5c C++26 reflection (P2996).** `^^T` reifies a type into a
+**4c C++26 reflection (P2996).** `^^T` reifies a type into a
 `std::meta::info`, `[: m :]` splices it back, `template for` peels the
 loop at compile time. No external codegen, no macros, just the language reflecting on itself.
 
-**6 Zig comptime.** `@typeInfo(T)` returns a regular value; `switch`,
+**5 Zig comptime.** `@typeInfo(T)` returns a regular value; `switch`,
 `inline for`, and `@field` are normal Zig that happens to execute
 during compilation. Same generic serializer pattern, no derive, no
-runtime reflection.
+runtime reflection. Generalises what C++ reaches for across three
+features into one mechanism.
+
+**6 Odin — runtime introspection.** The counterpoint to everything
+above. Odin has no user macros and no proc macros. Its metaprogramming
+is parametric polymorphism plus `core:reflect` walking the `Type_Info`
+attached to `any` at runtime. Same problem solved without any codegen
+at all — by the time you're here, `Type_Info` reads as "Zig's
+`@typeInfo`, but at runtime."
 
 **7 Common Lisp.** The original. A macro is a function from code to
 code, and because the source _is_ s-expressions the compile-time and
@@ -89,19 +92,19 @@ cd 2-Rust && cargo run --release
 # 3 Python
 python3 3-Python/main.py
 
-# 4 Odin
-cd 4-Odin && odin run .
+# 4a / 4b C++ (mainstream clang/gcc)
+cd 4-Cpp/templates && ./run.sh
+cd 4-Cpp/constexpr && ./run.sh
 
-# 5a / 5b C++ (mainstream clang/gcc)
-cd 5-Cpp/templates && ./run.sh
-cd 5-Cpp/constexpr && ./run.sh
-
-# 5c C++26 reflection — needs the bloomberg/clang-p2996 fork
+# 4c C++26 reflection — needs the bloomberg/clang-p2996 fork
 #   https://github.com/bloomberg/clang-p2996
-cd 5-Cpp/reflection && CLANG_P2996=/opt/clang-p2996 ./run.sh
+cd 4-Cpp/reflection && CLANG_P2996=/opt/clang-p2996 ./run.sh
 
-# 6 Zig (tested with 0.16.0; IO/ArrayList APIs churn between releases)
-cd 6-Zig && zig run main.zig
+# 5 Zig (tested with 0.16.0; IO/ArrayList APIs churn between releases)
+cd 5-Zig && zig run main.zig
+
+# 6 Odin
+cd 6-Odin && odin run .
 
 # 7 Lisp
 brew install sbcl   # if needed
