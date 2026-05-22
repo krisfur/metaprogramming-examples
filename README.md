@@ -40,8 +40,11 @@ codegen idea, but operating on ASTs instead of tokens. Inspect with
 
 **3 Python — decorator.** `@dataclass` inspects the class's
 annotations _at import time_ and synthesises `__init__`, `__repr__`,
-`__eq__`. Same idea as Rust's derive, moved from compile time to
-import time in a dynamic language.
+`__eq__`. A second decorator, `@json_serializable`, walks the same
+annotations and builds a `to_json` method by `exec`-ing a generated
+source string. Same idea as Rust's derive, moved from compile time
+to import time in a dynamic language. The script prints the generated
+source before running it.
 
 **4 Odin — runtime introspection.** Odin has no user macros and no
 proc macros. Its metaprogramming is parametric polymorphism plus
@@ -117,10 +120,11 @@ cc -E 1-C/main.c | sed -n '/typedef struct/,/^}/p'
 # Rust: expanded derive (needs `cargo install cargo-expand`)
 cd 2-Rust && cargo expand
 
-# Python: the synthesised __init__ signature
-# (inspect.getsource doesn't work — @dataclass exec's __init__ from a
-# generated string, so there's no source file to read.)
-cd 3-Python && python3 -c "import inspect; from main import User; print(inspect.signature(User.__init__))"
+# Python: the dataclass __init__ signature + the generated to_json source
+# (inspect.getsource doesn't work on @dataclass-generated __init__ — it's
+# exec'd from a string with no source file. The @json_serializable decorator
+# stashes its source on the method itself, so we can print that directly.)
+cd 3-Python && python3 -c "import inspect; from main import User; print(inspect.signature(User.__init__)); print(User.to_json.__source__)"
 
 # Lisp: macroexpansion is printed by main.lisp itself
 ```
