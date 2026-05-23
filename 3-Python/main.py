@@ -51,5 +51,7 @@ if __name__ == "__main__":
     print(User.to_json.__source__)  # ty: ignore[unresolved-attribute]
     print("output:")
     print(u.to_json())  # ty: ignore[unresolved-attribute]
-    print("(stdlib equivalent for comparison:)")
-    print(json.dumps({"id": u.id, "name": u.name, "email": u.email, "active": u.active}))
+    print("stdlib equivalent for comparison:")
+    print(
+        json.dumps({"id": u.id, "name": u.name, "email": u.email, "active": u.active})
+    )
