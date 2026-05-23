@@ -22,6 +22,10 @@ Same problem, six mechanisms.
 | 6   | [`6-Odin/`](6-Odin)                     | Odin        | parametric proc + `core:reflect`        |
 | 7   | [`7-Lisp/`](7-Lisp)                     | Common Lisp | `defmacro` (code-as-data)               |
 
+Excalidraw backdrop used:
+
+[https://excalidraw.com/#json=A4RsdVrVl0EkHjZJ5b132,ZjJUeasVRn57jttQya7D1g](https://excalidraw.com/#json=A4RsdVrVl0EkHjZJ5b132,ZjJUeasVRn57jttQya7D1g)
+
 ## What each one shows
 
 **1. `C` - X-macros** 
