@@ -30,13 +30,12 @@ One `USER_FIELDS` list is the single source of truth. Redefining `X_U32` / `X_ST
 
 **2. `Rust` - derive macros** 
 
-`serde_derive` is a procedural macro running in the compiler. It parses the struct, generates a `Serialize` impl, the rest is normal code. Direct upgrade from C macros: same codegen idea, but operating on ASTs instead of tokens. Inspect with `cargo expand`.
-
+`serde_derive` is a procedural macro running in the compiler. It parses the struct, generates a `Serialize` impl, the rest is normal code. 
 **3. `Python` - decorators** 
 
 `@dataclass` inspects the class's annotations at import time and synthesises `__init__`, `__repr__`, `__eq__`. 
 
-A second decorator, `@json_serializable`, walks the same annotations and builds a `to_json` method by `exec`-ing a generated source string. Same idea as Rust's derive, moved to import time in a dynamic language. 
+A second decorator, `@json_serializable`, walks the same annotations and builds a `to_json` method by `exec`-ing a generated source string.
 
 **4a. `C++` - templates and `if constexpr`** 
 
@@ -116,8 +115,7 @@ sbcl --script 7-Lisp/main.lisp
 
 ## Seeing the codegen on screen
 
-`Python`, `Odin`, and `Lisp` print their generated artefact (source string,
-`Type_Info` table, macroexpansion) as part of running the script.
+`Python`, `Odin`, and `Lisp` print their generated artefact (source string, `Type_Info` table, macroexpansion) as part of running the script.
 
 `C` and `Rust` have external tools that show what the macro produced:
 
