@@ -58,9 +58,9 @@ The compiler stamps out specialised code per type. `if constexpr` branches on ty
 
 Odin's metaprogramming is parametric polymorphism plus `core:reflect` walking the `Type_Info` attached to `any` at runtime. Same problem solved without any codegen at all.
 
-**7. `Common Lisp`** 
+**7. `Common Lisp` - `defmacro`**
 
-A macro is a function from code to code, and because the source is s-expressions the compile-time and runtime languages are the same language.
+A macro is a function from code to code, and because the source is s-expressions the compile-time and runtime languages are the same language. One `defjson` form takes a typed field list and emits both the `defstruct` and a serializer with per-field formatting resolved at expansion time: the "single list, multiple artefacts" trick C reaches for with X-macros, but operating on the parsed AST instead of token soup.
 
 ## Running each example
 
