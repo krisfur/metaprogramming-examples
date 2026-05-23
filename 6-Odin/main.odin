@@ -1,11 +1,10 @@
-// Odin doesn't do user-defined codegen (no macros, no proc macros).
-// Its "metaprogramming" is mostly:
-//   - parametric polymorphism (generics)  -- `proc(v: $T)`
-//   - compile-time `when` branches
-//   - runtime type introspection via core:reflect
+// Odin has no user macros. Metaprogramming = generics + `when` +
+// runtime introspection via core:reflect.
 //
-// Here, `to_json` is a single parametric procedure that walks any
-// struct's fields at runtime using the Type_Info attached to `any`.
+// Same shape as 5-Zig, but the switch runs at runtime against
+// `Type_Info` instead of comptime against `@typeInfo`. `any` is a fat
+// pointer of `{data, type_id}` — the runtime dual of `anytype`.
+// Unsupported types fall through to `%v` here; Zig `@compileError`s.
 
 package main
 
@@ -30,7 +29,7 @@ write_value :: proc(sb: ^strings.Builder, v: any) {
 			f := reflect.struct_field_at(v.id, i)
 			if i > 0 do strings.write_byte(sb, ',')
 			fmt.sbprintf(sb, "\"%s\":", f.name)
-			field_val := any{
+			field_val := any {
 				data = rawptr(uintptr(v.data) + f.offset),
 				id   = f.type.id,
 			}
@@ -54,7 +53,31 @@ to_json :: proc(v: any) -> string {
 	return strings.to_string(sb)
 }
 
+// Print the runtime type table `write_value` dispatches on.
+dump_type_info :: proc(v: any) {
+	ti := reflect.type_info_base(type_info_of(v.id))
+	fmt.printf("Type_Info for %v:\n", ti)
+	#partial switch info in ti.variant {
+	case reflect.Type_Info_Struct:
+		n := reflect.struct_field_count(v.id)
+		for i in 0 ..< n {
+			f := reflect.struct_field_at(v.id, i)
+			fmt.printf("  [%d] %s: %v (offset=%d)\n", i, f.name, f.type, f.offset)
+		}
+	}
+}
+
 main :: proc() {
-	u := User{id = 42, name = "alice", email = "a@x.com", active = true}
-	fmt.println(to_json(u))
+	u := User {
+		id     = 42,
+		name   = "alice",
+		email  = "a@x.com",
+		active = true,
+	}
+
+	dump_type_info(u)
+
+	out := to_json(u)
+	defer delete(out)
+	fmt.println(out)
 }

@@ -107,14 +107,15 @@ cd 5-Zig && zig run main.zig
 cd 6-Odin && odin run .
 
 # 7 Lisp
-brew install sbcl   # if needed
 sbcl --script 7-Lisp/main.lisp
 ```
 
 ## Seeing the codegen on screen
 
-Some of these get more pedagogical when you can see what the macro
-actually produced:
+Python, Odin, and Lisp print their generated artefact (source string,
+`Type_Info` table, macroexpansion) as part of running the script.
+
+C and Rust have external tools that show what the macro produced:
 
 ```sh
 # C: full preprocessor output
@@ -122,12 +123,8 @@ cc -E 1-C/main.c | sed -n '/typedef struct/,/^}/p'
 
 # Rust: expanded derive (needs `cargo install cargo-expand`)
 cd 2-Rust && cargo expand
-
-# Python: the dataclass __init__ signature + the generated to_json source
-# (inspect.getsource doesn't work on @dataclass-generated __init__ — it's
-# exec'd from a string with no source file. The @json_serializable decorator
-# stashes its source on the method itself, so we can print that directly.)
-cd 3-Python && python3 -c "import inspect; from main import User; print(inspect.signature(User.__init__)); print(User.to_json.__source__)"
-
-# Lisp: macroexpansion is printed by main.lisp itself
 ```
+
+C++ and Zig don't have a clean equivalent: template instantiation,
+C++26 reflection, and Zig's `comptime` all run inside the compiler
+with no source-level artefact to dump.
