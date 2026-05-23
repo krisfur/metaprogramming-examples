@@ -1,13 +1,26 @@
-// Templates: the compiler stamps out a specialized version of the
-// function for every T you call it with. Same source code, different
-// machine code per type. `if constexpr` lets us branch on type traits
-// at compile time so the runtime path stays clean.
+// Templates + constexpr-if: the C++17 metaprogramming toolkit.
+//
+// Templates make the compiler stamp out a specialized version of the
+// function for every T you call it with — same source code, different
+// machine code per type. `if constexpr` then lets a single template
+// body branch on type traits at compile time; the dead branches are
+// thrown away during instantiation, so the runtime path stays clean.
+//
+// The catch: C++17 has no way to walk a struct's fields. `to_json` for
+// `User` has to list them by hand. That's the gap C++26 reflection
+// fills (see ../reflection/).
 
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <type_traits>
-#include <vector>
+
+struct User {
+    unsigned    id;
+    std::string name;
+    std::string email;
+    bool        active;
+};
 
 template <typename T>
 std::string to_json_value(const T& v) {
@@ -22,23 +35,17 @@ std::string to_json_value(const T& v) {
     }
 }
 
-template <typename T>
-std::string to_json_array(const std::vector<T>& xs) {
-    std::ostringstream os;
-    os << '[';
-    for (size_t i = 0; i < xs.size(); ++i) {
-        if (i) os << ',';
-        os << to_json_value(xs[i]);
-    }
-    os << ']';
-    return os.str();
+std::string to_json(const User& u) {
+    std::string out = "{";
+    out += "\"id\":"     + to_json_value(u.id)     + ",";
+    out += "\"name\":"   + to_json_value(u.name)   + ",";
+    out += "\"email\":"  + to_json_value(u.email)  + ",";
+    out += "\"active\":" + to_json_value(u.active);
+    out += "}";
+    return out;
 }
 
 int main() {
-    std::cout << to_json_array<int>({1, 2, 3}) << "\n";
-    std::cout << to_json_array<std::string>({"alice", "bob"}) << "\n";
-    // (std::vector<bool> is specialised and returns a proxy ref,
-    // so skip it here; scalars work fine.)
-    std::cout << to_json_value(true) << "\n";
-    std::cout << to_json_value(std::string{"hello"}) << "\n";
+    User u{42, "alice", "a@x.com", true};
+    std::cout << to_json(u) << "\n";
 }

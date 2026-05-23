@@ -11,7 +11,7 @@ User { id: 42, name: "alice", email: "a@x.com", active: true }
   ->  {"id":42,"name":"alice","email":"a@x.com","active":true}
 ```
 
-Same problem, seven mechanisms.
+Same problem, six mechanisms.
 
 | #   | Folder                                  | Language    | Mechanism                               |
 | --- | --------------------------------------- | ----------- | --------------------------------------- |
@@ -19,8 +19,7 @@ Same problem, seven mechanisms.
 | 2   | [`2-Rust/`](2-Rust)                     | Rust        | `#[derive(Serialize)]` procedural macro |
 | 3   | [`3-Python/`](3-Python)                 | Python      | `@dataclass` + custom decorator         |
 | 4a  | [`4-Cpp/templates/`](4-Cpp/templates)   | C++17       | templates + `if constexpr`              |
-| 4b  | [`4-Cpp/constexpr/`](4-Cpp/constexpr)   | C++20       | compile-time evaluation (FNV1a switch)  |
-| 4c  | [`4-Cpp/reflection/`](4-Cpp/reflection) | C++26       | static reflection (P2996)               |
+| 4b  | [`4-Cpp/reflection/`](4-Cpp/reflection) | C++26       | static reflection (P2996)               |
 | 5   | [`5-Zig/`](5-Zig)                       | Zig         | `comptime` + `@typeInfo` + `inline for` |
 | 6   | [`6-Odin/`](6-Odin)                     | Odin        | parametric proc + `core:reflect`        |
 | 7   | [`7-Lisp/`](7-Lisp)                     | Common Lisp | `defmacro` (code-as-data)               |
@@ -46,16 +45,15 @@ source string. Same idea as Rust's derive, moved from compile time
 to import time in a dynamic language. The script prints the generated
 source before running it.
 
-**4a C++ templates.** The compiler stamps out specialised code per
-type. `if constexpr` branches on traits at compile time so runtime
-stays branch-free. (The `std::vector<bool>` proxy quirk is skipped in
+**4a C++ templates + `if constexpr`.** The compiler stamps out
+specialised code per type. `if constexpr` branches on type traits at
+compile time, so a single template body can format strings, bools, and
+streamable types without any runtime branching — dead branches are
+discarded during instantiation. This is the mainstream C++17 toolkit
+for generic code. (The `std::vector<bool>` proxy quirk is skipped in
 the demo — left as a comment.)
 
-**4b C++ constexpr.** Realistic use: `fnv1a` on a string literal at
-compile time so you can `switch` on strings, which the language
-otherwise forbids.
-
-**4c C++26 reflection (P2996).** `^^T` reifies a type into a
+**4b C++26 reflection (P2996).** `^^T` reifies a type into a
 `std::meta::info`, `[: m :]` splices it back, `template for` peels the
 loop at compile time. No external codegen, no macros, just the language reflecting on itself.
 
@@ -92,11 +90,10 @@ cd 2-Rust && cargo run --release
 # 3 Python
 python3 3-Python/main.py
 
-# 4a / 4b C++ (mainstream clang/gcc)
+# 4a C++ (mainstream clang/gcc)
 cd 4-Cpp/templates && ./run.sh
-cd 4-Cpp/constexpr && ./run.sh
 
-# 4c C++26 reflection — needs the bloomberg/clang-p2996 fork
+# 4b C++26 reflection — needs the bloomberg/clang-p2996 fork
 #   https://github.com/bloomberg/clang-p2996
 cd 4-Cpp/reflection && CLANG_P2996=/opt/clang-p2996 ./run.sh
 
