@@ -31,6 +31,7 @@ One `USER_FIELDS` list is the single source of truth. Redefining `X_U32` / `X_ST
 **2. `Rust` - derive macros** 
 
 `serde_derive` is a procedural macro running in the compiler. It parses the struct, generates a `Serialize` impl, the rest is normal code. 
+
 **3. `Python` - decorators** 
 
 `@dataclass` inspects the class's annotations at import time and synthesises `__init__`, `__repr__`, `__eq__`. 
