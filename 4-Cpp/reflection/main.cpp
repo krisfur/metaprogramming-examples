@@ -3,9 +3,12 @@
 // iterate a struct's members at compile time *in the language itself*,
 // not through external code generators or macros.
 //
-// Requires a compiler that implements P2996 — currently the
-// bloomberg/clang-p2996 fork (https://github.com/bloomberg/clang-p2996).
-// Mainstream clang/gcc do not have this yet as of 2026.
+// Requires a compiler that implements P2996. As of mid-2026:
+//   - GCC 16.1 (April 2026) supports it via `-std=c++26 -freflection`,
+//     but isn't packaged everywhere yet (e.g. homebrew is still on 15).
+//   - The bloomberg/clang-p2996 fork remains the easiest prebuilt path
+//     and is what run.sh uses: https://github.com/bloomberg/clang-p2996
+//   - Mainstream clang and MSVC don't have it yet.
 
 #include <experimental/meta>
 #include <iostream>

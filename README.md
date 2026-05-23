@@ -93,7 +93,10 @@ python3 3-Python/main.py
 # 4a C++ (mainstream clang/gcc)
 cd 4-Cpp/templates && ./run.sh
 
-# 4b C++26 reflection — needs the bloomberg/clang-p2996 fork
+# 4b C++26 reflection — needs a compiler that implements P2996.
+#   GCC 16.1 (April 2026) supports it via `-std=c++26 -freflection`,
+#   but isn't packaged everywhere yet. The bloomberg/clang-p2996 fork
+#   is the easiest prebuilt path and what run.sh uses:
 #   https://github.com/bloomberg/clang-p2996
 cd 4-Cpp/reflection && CLANG_P2996=/opt/clang-p2996 ./run.sh
 
